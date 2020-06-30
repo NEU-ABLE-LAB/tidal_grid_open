@@ -5,7 +5,7 @@
 %% Parameters
 
 % Generator
-gen_rated_power = 10^4; % kW
+gen_rated_power = (10^5)*1.9; % kW
 
 %% Make island
 
@@ -13,10 +13,6 @@ sys = make_island_aspirational('Simple LIB');
 
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
-
-fmincon_options = optimoptions(@fmincon, ...
-    'Display','iter', ...
-    'PlotFcn', {@optimplotfval,@optimplotstepsize});
 
 cost_fun(sys, gen_rated_power)
 

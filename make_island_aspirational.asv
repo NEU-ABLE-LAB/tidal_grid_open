@@ -34,12 +34,8 @@ t = d_profile.t;
 d_profile = d_profile.data;
 
 % Scale total demand to 8 GWh
-%  Avg US home uses ~914 kWh/mo
-%   https://www.eia.gov/tools/faqs/faq.php?id=97&t=3
-%  Block island has 449 households
-%   https://www.point2homes.com/US/Neighborhood/RI/New-Shoreham/Block-Island-Demographics.html
-d_yr_tot = 914E3 * 449; % Yearly energy consumption (Wh)
-d_profile = d_profile * d_yr_tot / sum(d_profile);
+
+d_profile = d_profile * 8E6 / sum(d_profile);
 
 % Specify time vector
 k = (0:length(d_profile)-1)';

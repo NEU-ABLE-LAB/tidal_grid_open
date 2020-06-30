@@ -141,7 +141,7 @@ classdef IslandBattery < IslandPart
             obj.capacity_power = max(abs(obj.charge_rate(2:end)));
             
             % Update battery energy and power costs
-            obj.cost_energy = obj.COST_E * obj.capacity_energy;
+            obj.cost_energy = obj.COST_E * obj.capacity_energy;%start here when looking in too controllers
             obj.cost_power = obj.COST_P * obj.capacity_power;
             if obj.charge(end) >= obj.charge(1)
                 obj.cost_error = 0;
