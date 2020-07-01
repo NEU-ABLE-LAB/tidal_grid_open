@@ -70,7 +70,6 @@ demand = IslandDemand('8GWh ISO NE', k, d_profile);
 % Battery energy capacity cost ($/kWh)
 %   Aspirational estimate from 'Model numbers for Mike.docx'
 LIB_cost_E = p.Results.LIB_cost_E;% ($/kWh)
-disp(LIB_cost_E)
 
 % Battery power capacity cost ($/kW) 
 %   Aspirational estimate from 'Model numbers for Mike.docx'
