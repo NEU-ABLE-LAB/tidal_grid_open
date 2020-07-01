@@ -9,7 +9,7 @@ gen_rated_power = (10^5)*1.9; % kW
 
 %% Make island
 
-sys = make_island_aspirational('Simple LIB');
+sys = make_island_aspirational('Simple LIB','households',1000);
 
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
