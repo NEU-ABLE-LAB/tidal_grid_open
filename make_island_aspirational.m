@@ -2,8 +2,6 @@ function sys = make_island_aspirational(name,varargin)
 %MAKE_ISLAND_ASPIRATIONAL Make an aspirational islanded power system
 
 %% Parse inputs
-
-
 p = inputParser;
 
 % System inputs
@@ -17,6 +15,20 @@ addParameter(p,'households',449)
 
 % LIB inputs
 addParameter(p,'LIB_cost_E',220);
+addParameter(p,'LIB_cost_P',0);
+addParameter(p,'LIB_cycle_life',4000);
+
+% flow inputs
+addParameter(p,'flow_cost_E',30);
+addParameter(p,'flow_cost_P',1000);
+addParameter(p,'flow_cycle_life',12000);
+
+% generator inputs
+addParameter(p,'gen_cost_P',4300);
+addParameter(p,'gen_lifetime',20);
+
+% island inputs
+addParameter(p,'grid_costs',5);
 
 % Parse inputs
 parse(p,name,varargin{:})
@@ -57,16 +69,16 @@ demand = IslandDemand('8GWh ISO NE', k, d_profile);
 
 % Battery energy capacity cost ($/kWh)
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-LIB_cost_E = p.Results.LIB_cost_E; 
+LIB_cost_E = p.Results.LIB_cost_E;% ($/kWh)
 disp(LIB_cost_E)
 
 % Battery power capacity cost ($/kW) 
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-LIB_cost_P = 0; 
+LIB_cost_P = p.Results.LIB_cost_P;% ($/kW)
 
 % Battery cycle life (cycles) 
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-LIB_cycle_life = 4000;
+LIB_cycle_life = p.Results.LIB_cycle_life;% cycles
 
 % Construct battery
 bat_LIB = IslandBatteryLIB('LIB', LIB_cost_E, LIB_cost_P, LIB_cycle_life, k);
@@ -76,15 +88,15 @@ bat_LIB = IslandBatteryLIB('LIB', LIB_cost_E, LIB_cost_P, LIB_cycle_life, k);
 
 % Battery energy capacity cost ($/kWh)
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-flow_cost_E = 30; 
+flow_cost_E = p.Results.flow_cost_E;% ($/kWh)
 
 % Battery power capacity cost ($/kW)
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-flow_cost_P = 1000; 
+flow_cost_P = p.Results.flow_cost_P;% ($/kW)
 
 % battery cycle life (cycles)
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-flow_cycle_life = 12000; 
+flow_cycle_life = p.Results.flow_cycle_life;% cycles
 
 % Construct battery
 bat_flow = IslandBatteryFlow('flow', flow_cost_E, flow_cost_P, flow_cycle_life, k);
@@ -94,11 +106,11 @@ bat_flow = IslandBatteryFlow('flow', flow_cost_E, flow_cost_P, flow_cycle_life, 
 
 % Cost per rated kW
 %   From doi:10.1016/j.energy.2016.03.123
-gen_cost_p = 4300; % ($/kW)
+gen_cost_P = p.Results.gen_cost_P;% ($/kW)
 
 % Lifetime in years 
-%   From doi:10.1016/j.energy.2016.03.123
-gen_lifetime = 20;
+%   default from doi:10.1016/j.energy.2016.03.123
+gen_lifetime = p.Results.gen_lifetime% (years)
 
 % Generation profile
 %   Multipy short and long time-scale sine waves
@@ -109,12 +121,12 @@ P_profile = (sin(k/6.2*2*pi)+1)/2 ... short time-scale
     .* (sin(k/360*2*pi)+1)/2; % long time-scale
 
 % Construct generator
-gen = IslandGenRenewable('tidal', gen_cost_p, gen_lifetime, k, P_profile);
+gen = IslandGenRenewable('tidal', gen_cost_P, gen_lifetime, k, P_profile);
 
 
 %% Island system
 
-grid_costs = 5; % ($/kWh)
+grid_costs = p.Results.grid_costs; % ($/kWh)
 
 sys = IslandSys(name, t, {gen}, {bat_LIB, bat_flow}, {demand}, ...
     grid_costs);

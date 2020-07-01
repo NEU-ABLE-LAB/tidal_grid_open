@@ -13,9 +13,21 @@ addOptional(p,'name','Aspirational',@isstr);
 addParameter(p,'d_profile_fName',...
     'data/OI_darthrmwh_iso_4005_20190101_20191231',...
     @isstr)
+addParameter(p,'households',449)
 
 % LIB inputs
 addParameter(p,'LIB_cost_E',220);
+addParameter(p,'LIB_cost_P',0);
+addParameter(p,'LIB_cycle_life',4000);
+
+% flow inputs
+addParameter(p,'flow_cost_E',30);
+addParameter(p,'flow_cost_P',1000);
+addParameter(p,'flow_cycle_life',12000);
+
+% generator inputs
+addParameter(p,'gen_cost_P',4300);
+addParameter(p,'gen_lifetime',12000);
 
 % Parse inputs
 parse(p,name,varargin{:})
@@ -33,13 +45,16 @@ d_profile = load(p.Results.d_profile_fName, ...
 t = d_profile.t;
 d_profile = d_profile.data;
 
+households = p.Results.households; 
+disp(households)
+
 % Scale total demand to 8 GWh
 %  Avg US home uses ~914 kWh/mo
 %   https://www.eia.gov/tools/faqs/faq.php?id=97&t=3
 %  Block island has 449 households
 %   https://www.point2homes.com/US/Neighborhood/RI/New-Shoreham/Block-Island-Demographics.html
 d_US_household = 914E3;% 914kWh
-d_yr_tot = d_US_household * 449; % Yearly energy consumption (Wh)
+d_yr_tot = d_US_household * households; % Yearly energy consumption (Wh)
 d_profile = d_profile * d_yr_tot / sum(d_profile);
 
 % Specify time vector
@@ -58,11 +73,11 @@ disp(LIB_cost_E)
 
 % Battery power capacity cost ($/kW) 
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-LIB_cost_P = 0; 
+LIB_cost_P = p.Results.LIB_cost_P; 
 
 % Battery cycle life (cycles) 
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-LIB_cycle_life = 4000;
+LIB_cycle_life = p.Results.LIB_cycle_life; 
 
 % Construct battery
 bat_LIB = IslandBatteryLIB('LIB', LIB_cost_E, LIB_cost_P, LIB_cycle_life, k);
@@ -72,15 +87,15 @@ bat_LIB = IslandBatteryLIB('LIB', LIB_cost_E, LIB_cost_P, LIB_cycle_life, k);
 
 % Battery energy capacity cost ($/kWh)
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-flow_cost_E = 30; 
+flow_cost_E = p.Results.flow_cost_E; 
 
 % Battery power capacity cost ($/kW)
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-flow_cost_P = 1000; 
+flow_cost_P = p.Results.flow_cost_P; 
 
 % battery cycle life (cycles)
 %   Aspirational estimate from 'Model numbers for Mike.docx'
-flow_cycle_life = 12000; 
+flow_cycle_life = p.Results.flow_cycle_life; 
 
 % Construct battery
 bat_flow = IslandBatteryFlow('flow', flow_cost_E, flow_cost_P, flow_cycle_life, k);
