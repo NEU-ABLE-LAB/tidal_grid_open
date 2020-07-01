@@ -3,7 +3,7 @@
 %   law of charge when supply>demand, and discharge otherwise.
 
 %% Parameters
-
+%Jonathan rules, kriss stinks!
 % Generator
 gen_rated_power = (10^5)*1.9; % kW
 
