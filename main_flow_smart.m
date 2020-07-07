@@ -40,11 +40,16 @@ function cost = cost_fun(sys, gen_rated_power)
     deficit = sys.demand - sys.supply;
     deficit = deficit(1:end-1);
     
+    % Smart flow battery charge and discharge rule that minimizes the
+    % number of times the battery switches from charging to dischargin
+    lag = 6;
+    charge = smooth(-deficit, lag);
+    
     % Assign the independent variables to the model
     %   gen.rated_power - scalar rated power of generator
     %   bat(%LIB%).charge_rate  - charge rate of LIB at each hour
     %   bat(%flow%).charge_rate - charge rate of flow batt at each hour
-    sys.opt('x',[gen_rated_power; 0*deficit; -deficit])
+    sys.opt('x',[gen_rated_power; 0*deficit; charge])
     
     % Calculate the LCOE
     cost = sys.LCOE();

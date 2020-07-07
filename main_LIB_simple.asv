@@ -5,13 +5,13 @@
 %% Parameters
 % Generator
 i=0;% iterator value
-stage=100000;% difference value at various stages
+stage=100000000;% difference value at various stages
 while 1
     gen_rated_power = i; % kW
 
 %% Make island
 
-    sys = make_island_aspirational('Simple LIB','households',328200000);
+    sys = make_island_aspirational('Simple LIB','households',449);
 
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
@@ -31,6 +31,9 @@ end
 sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
 
 function cost = cost_fun(sys, gen_rated_power)
+
+    % Assign the generated rated power 
+    %   Which then calc
     sys.gens{1}.rated_power = gen_rated_power;
     deficit = sys.demand - sys.supply;
     deficit = deficit(1:end-1);

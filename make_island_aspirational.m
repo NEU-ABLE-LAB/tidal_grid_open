@@ -19,8 +19,8 @@ addParameter(p,'LIB_cost_P',0);
 addParameter(p,'LIB_cycle_life',4000);
 
 % flow inputs
-addParameter(p,'flow_cost_E',30);
-addParameter(p,'flow_cost_P',1000);
+addParameter(p,'flow_cost_E',30); % ($/kWh)
+addParameter(p,'flow_cost_P',1000); % ($/kW)
 addParameter(p,'flow_cycle_life',12000);
 
 % generator inputs

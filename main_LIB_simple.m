@@ -31,11 +31,24 @@ end
 sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
 
 function cost = cost_fun(sys, gen_rated_power)
+
+    % Assign the generated rated power 
+    %   Which updates the power generated profiles
     sys.gens{1}.rated_power = gen_rated_power;
+    
+    % Calculate the deficit at each hour, assuming no battery
     deficit = sys.demand - sys.supply;
     deficit = deficit(1:end-1);
+    
+    % Assign the independent variables to the model
+    %   gen.rated_power - scalar rated power of generator
+    %   bat(%LIB%).charge_rate  - charge rate of LIB at each hour
+    %   bat(%flow%).charge_rate - charge rate of flow batt at each hour
     sys.opt('x',[gen_rated_power; -deficit; 0*deficit])
+    
+    % Calculate the LCOE
     cost = sys.LCOE();
+    
 end
 
 
