@@ -47,7 +47,6 @@ t = d_profile.t;
 d_profile = d_profile.data;
 
 households = p.Results.households; 
-disp(households)
 
 % Scale total demand to 8 GWh
 %  Avg US home uses ~914 kWh/mo
@@ -109,7 +108,7 @@ gen_cost_P = p.Results.gen_cost_P;% ($/kW)
 
 % Lifetime in years 
 %   default from doi:10.1016/j.energy.2016.03.123
-gen_lifetime = p.Results.gen_lifetime% (years)
+gen_lifetime = p.Results.gen_lifetime;% (years)
 
 % Generation profile
 %   Multipy short and long time-scale sine waves
