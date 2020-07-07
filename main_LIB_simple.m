@@ -5,13 +5,13 @@
 %% Parameters
 % Generator
 i=0;% iterator value
-stage=10000;% difference value at various stages
+stage=100000000;% difference value at various stages
 while 1
     gen_rated_power = i; % kW
 
 %% Make island
 
-    sys = make_island_aspirational('Simple LIB');
+    sys = make_island_aspirational('Simple LIB','households',449);
 
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
