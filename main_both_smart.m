@@ -37,14 +37,21 @@ end
 
 
 
-for lag = 1:8759
-    cost_fun(sys, gen_rated_power,lag);
-    x(lag)=sys.LCOE();
-end
-disp(min(x))
+% for lag = 1:8759
+%     cost_fun(sys, gen_rated_power,lag);
+%     x(lag)=sys.LCOE();
+% end
+% [~,index] = min(x);
+% cost_fun(sys, gen_rated_power,x(index));
+% 
+% 
+% disp(minimum)
+% disp(index)
 
-%[LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
-%sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
+cost_fun(sys, gen_rated_power,25);
+
+[LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
+sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
 
 function cost = cost_fun(sys, gen_rated_power,lag)
 
