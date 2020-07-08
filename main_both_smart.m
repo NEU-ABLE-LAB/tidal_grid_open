@@ -7,11 +7,11 @@
 
 % Battery balance
 %   Percent of power that goes to the LIB battery
-batt_balance = [0.25, 0.75];
 
 % Generator
 iter=0;% iterator value
-stage=100000;% difference value at various stages
+stage=1000000;% difference value at various stages
+lag = 1;
 while 1
     gen_rated_power = iter; % kW
 
@@ -22,7 +22,7 @@ while 1
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
 
-    cost_fun(sys, gen_rated_power, batt_balance);
+    cost_fun(sys, gen_rated_power,lag);
 
     if (sys.batts{1,2}.charge(1) - sys.batts{1,2}.charge(end) <= stage)% if the difference between start and end charge is less then the current stage...
         if (stage == 1)% if on the lowest stage...
@@ -33,10 +33,20 @@ while 1
     end
     iter=iter+stage;% increase iter by stage
 end
-[LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
-sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
 
-function cost = cost_fun(sys, gen_rated_power, batt_balance)
+
+
+
+for lag = 1:8759
+    cost_fun(sys, gen_rated_power,lag);
+    x(lag)=sys.LCOE();
+end
+disp(min(x))
+
+%[LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
+%sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
+
+function cost = cost_fun(sys, gen_rated_power,lag)
 
     % Assign the generated rated power 
     %   Which updates the power generated profiles
@@ -48,7 +58,6 @@ function cost = cost_fun(sys, gen_rated_power, batt_balance)
     
     % Smart flow battery charge and discharge rule that minimizes the
     % number of times the battery switches from charging to dischargin
-    lag = 24;
     charge_flow = smooth(-deficit, lag);
     
     % Have the LIB pick up the slack of when the flow battery wasn't able
