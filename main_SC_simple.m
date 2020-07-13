@@ -11,14 +11,14 @@ while 1
 
 %% Make island
 
-    sys = make_island_aspirational('Simple LIB','households',449);
+    sys = make_island_aspirational('Simple SC');
 
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
 
     cost_fun(sys, gen_rated_power);
 
-    if (sys.batts{1}.charge(1) - sys.batts{1}.charge(end) <= stage)% if the difference between start and end charge is less then the current stage...
+    if (sys.batts{1,3}.charge(1) - sys.batts{1,3}.charge(end) <= stage)% if the difference between start and end charge is less then the current stage...
         if (stage == 1)% if on the lowest stage...
             break% ...leave the loop
         end
@@ -44,7 +44,7 @@ function cost = cost_fun(sys, gen_rated_power)
     %   gen.rated_power - scalar rated power of generator
     %   bat(%LIB%).charge_rate  - charge rate of LIB at each hour
     %   bat(%flow%).charge_rate - charge rate of flow batt at each hour
-    sys.opt('x',[gen_rated_power; -deficit; 0*deficit])
+    sys.opt('x',[gen_rated_power; 0*deficit; 0*deficit; -deficit])
     
     % Calculate the LCOE
     cost = sys.LCOE();

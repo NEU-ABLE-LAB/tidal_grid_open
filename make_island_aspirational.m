@@ -24,8 +24,8 @@ addParameter(p,'flow_cost_P',1000); % ($/kW)
 addParameter(p,'flow_cycle_life',12000);
 
 % SC inputs
-addParameter(p,'SC_cost_E',30); % ($/kWh)
-addParameter(p,'SC_cost_P',1000); % ($/kW)
+addParameter(p,'SC_cost_E',2000); % ($/kWh)
+addParameter(p,'SC_cost_P',300); % ($/kW)
 addParameter(p,'SC_cycle_life',500000);
 
 % tidal inputs
@@ -155,7 +155,7 @@ solar_cost_P = p.Results.solar_cost_P;% ($/kW)
 solar_lifetime = p.Results.solar_lifetime;% (years)
 
 % Generation profile
-load('DC_solar_hourly.mat');
+load('data/DC_solar_hourly.mat');
 x=DC_solar_hourly/1000;
 P_solar_profile = x;
 

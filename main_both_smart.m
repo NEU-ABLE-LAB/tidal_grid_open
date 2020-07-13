@@ -17,7 +17,7 @@ while 1
     gen_rated_power = iter; % kW
 
 %% Make island
-    sys = make_island_aspirational('simple flow','households', 15000);
+    sys = make_island_aspirational('simple flow');
 
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE

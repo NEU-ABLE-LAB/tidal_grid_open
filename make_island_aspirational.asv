@@ -23,6 +23,11 @@ addParameter(p,'flow_cost_E',30); % ($/kWh)
 addParameter(p,'flow_cost_P',1000); % ($/kW)
 addParameter(p,'flow_cycle_life',12000);
 
+% SC inputs
+addParameter(p,'SC_cost_E',2000); % ($/kWh)
+addParameter(p,'SC_cost_P',300); % ($/kW)
+addParameter(p,'SC_cycle_life',500000);
+
 % tidal inputs
 addParameter(p,'tidal_cost_P',4300);
 addParameter(p,'tidal_lifetime',20);
@@ -104,6 +109,20 @@ flow_cycle_life = p.Results.flow_cycle_life;% cycles
 bat_flow = IslandBatteryFlow('flow', flow_cost_E, flow_cost_P, flow_cycle_life, k);
 
 
+%% Flow battery
+
+% Super capacitor energy capacity cost ($/kWh)
+SC_cost_E = p.Results.SC_cost_E;% ($/kWh)
+
+% Super capacitor power capacity cost ($/kW)
+SC_cost_P = p.Results.SC_cost_P;% ($/kW)
+
+% Seuper capacitor cycle life (cycles)
+SC_cycle_life = p.Results.SC_cycle_life;% cycles
+
+% Construct battery
+bat_SC = IslandBatterySC('SC', SC_cost_E, SC_cost_P, SC_cycle_life, k);
+
 %% Generator
 
 % % Cost per rated kW
@@ -136,7 +155,7 @@ solar_cost_P = p.Results.solar_cost_P;% ($/kW)
 solar_lifetime = p.Results.solar_lifetime;% (years)
 
 % Generation profile
-load('DC_solar_hourly.mat');
+load('data/DC_solar_hourly.mat');
 x=DC_solar_hourly/1000;
 P_solar_profile = x;
 
@@ -149,7 +168,7 @@ gen = IslandGenRenewable('tidal', solar_cost_P, solar_lifetime, k, P_solar_profi
 
 grid_costs = p.Results.grid_costs; % ($/kWh)
 
-sys = IslandSys(name, t, {gen}, {bat_LIB, bat_flow}, {demand}, ...
+sys = IslandSys(name, t, {gen}, {bat_LIB, bat_flow, bat_SC}, {demand}, ...
     grid_costs);
 
 end
