@@ -1,4 +1,4 @@
-function sys = make_island_aspirational(name,x,varargin)
+function sys = make_island_aspirational(name,varargin)
 %MAKE_ISLAND_ASPIRATIONAL Make an aspirational islanded power system
 
 %% Parse inputs
@@ -104,8 +104,8 @@ flow_cycle_life = p.Results.flow_cycle_life;% cycles
 bat_flow = IslandBatteryFlow('flow', flow_cost_E, flow_cost_P, flow_cycle_life, k);
 
 
-% %% Generator
-% 
+%% Generator
+
 % % Cost per rated kW
 % %   From doi:10.1016/j.energy.2016.03.123
 % tidal_cost_P = p.Results.tidal_cost_P;% ($/kW)
@@ -136,6 +136,8 @@ solar_cost_P = p.Results.solar_cost_P;% ($/kW)
 solar_lifetime = p.Results.solar_lifetime;% (years)
 
 % Generation profile
+load('DC_solar_hourly.mat');
+x=DC_solar_hourly/1000;
 P_solar_profile = x;
 
 % Construct generator

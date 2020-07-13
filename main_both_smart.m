@@ -12,13 +12,12 @@
 iter=0;% iterator value
 stage=1000000;% difference value at various stages
 lag = 1;
-load('C:\devel\tidal_grid\data\DC_solar_hourly.mat');
-x=DC_solar_hourly/1000;
+
 while 1
     gen_rated_power = iter; % kW
 
 %% Make island
-    sys = make_island_aspirational('simple flow',x);
+    sys = make_island_aspirational('simple flow','households', 15000);
 
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
