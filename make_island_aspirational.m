@@ -123,46 +123,46 @@ SC_cycle_life = p.Results.SC_cycle_life;% cycles
 % Construct battery
 bat_SC = IslandBatterySC('SC', SC_cost_E, SC_cost_P, SC_cycle_life, k);
 
-%% Generator
-
-% % Cost per rated kW
-% %   From doi:10.1016/j.energy.2016.03.123
-% tidal_cost_P = p.Results.tidal_cost_P;% ($/kW)
-% 
-% % Lifetime in years 
-% %   default from doi:10.1016/j.energy.2016.03.123
-% tidal_lifetime = p.Results.tidal_lifetime;% (years)
-% 
-% % Generation profile
-% %   Multipy short and long time-scale sine waves
-% %   long time-scale: 360 hour wavelength
-% %   short time-scale: 6.2 hour wavelength
-% %   from 'Model numbers for Mike.docx'
-% P_tidal_profile = (sin(k/6.2*2*pi)+1)/2 ... short time-scale
-%     .* (sin(k/360*2*pi)+1)/2; % long time-scale
-% 
-% % Construct generator
-% gen = IslandGenRenewable('tidal', tidal_cost_P, tidal_lifetime, k, P_tidal_profile);
-
-%% Generator
+%% Generator TIDAL
 
 % Cost per rated kW
 %   From doi:10.1016/j.energy.2016.03.123
-solar_cost_P = p.Results.solar_cost_P;% ($/kW)
+tidal_cost_P = p.Results.tidal_cost_P;% ($/kW)
 
 % Lifetime in years 
 %   default from doi:10.1016/j.energy.2016.03.123
-solar_lifetime = p.Results.solar_lifetime;% (years)
+tidal_lifetime = p.Results.tidal_lifetime;% (years)
 
 % Generation profile
-load('data/DC_solar_hourly.mat');
-x=DC_solar_hourly/1000;
-P_solar_profile = x;
+%   Multipy short and long time-scale sine waves
+%   long time-scale: 360 hour wavelength
+%   short time-scale: 6.2 hour wavelength
+%   from 'Model numbers for Mike.docx'
+P_tidal_profile = (sin(k/6.2*2*pi)+1)/2 ... short time-scale
+    .* (sin(k/360*2*pi)+1)/2; % long time-scale
 
 % Construct generator
-gen = IslandGenRenewable('tidal', solar_cost_P, solar_lifetime, k, P_solar_profile);
+gen = IslandGenRenewable('tidal', tidal_cost_P, tidal_lifetime, k, P_tidal_profile);
 
-
+%% Generator SOLAR
+% 
+% % Cost per rated kW
+% %   From doi:10.1016/j.energy.2016.03.123
+% solar_cost_P = p.Results.solar_cost_P;% ($/kW)
+% 
+% % Lifetime in years 
+% %   default from doi:10.1016/j.energy.2016.03.123
+% solar_lifetime = p.Results.solar_lifetime;% (years)
+% 
+% % Generation profile
+% load('data/DC_solar_hourly.mat');
+% x=DC_solar_hourly/1000;
+% P_solar_profile = x;
+% 
+% % Construct generator
+% gen = IslandGenRenewable('tidal', solar_cost_P, solar_lifetime, k, P_solar_profile);
+% 
+% 
 
 %% Island system
 
