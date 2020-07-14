@@ -23,7 +23,7 @@ while 1
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
 
-    cost_fun(sys, gen_rated_power,1);
+    cost_fun(sys, gen_rated_power,1,1);
 
     if (sys.batts{1,2}.charge(1) - sys.batts{1,2}.charge(end) <= stage)% if the difference between start and end charge is less then the current stage...
         if (stage == 1)% if on the lowest stage...
@@ -38,12 +38,12 @@ end
 
 
 %%
-for iter = 1:100
-    cost_fun(sys, gen_rated_power,iter);
-    x(iter)=sys.LCOE();
-end
-[~,index] = min(x);
-cost_fun(sys, gen_rated_power,x(index))
+% for iter = 1:100
+%     cost_fun(sys, gen_rated_power,iter);
+%     x(iter)=sys.LCOE();
+% end
+% [~,index] = min(x);
+% cost_fun(sys, gen_rated_power,x(index))
 
 
 % for lag = 1:8760
@@ -57,10 +57,30 @@ cost_fun(sys, gen_rated_power,x(index))
 
 %cost_fun(sys, gen_rated_power,1);
 
+
+%fun = cost_fun(sys, gen_rated_power,x);
+  
+   x0 = [0];
+   lb = zeros(size(x0));
+   ub = [];
+   A = [];
+   b = [];
+   Aeq = [];
+   beq = [];
+   nonlcon = [];%@unitdesk;
+for iter = 1:100
+   fmincon (@(x) (cost_fun(sys,gen_rated_power,iter,x)), x0, A, b, Aeq, beq, lb, ub, nonlcon);
+   x_array(iter) = sys.LCOE();
+end
+[~, index] = min(x_array)
+fmincon (@(x) (cost_fun(sys,gen_rated_power,iter,x)), x0, A, b, Aeq, beq, lb, ub, nonlcon);
+  
+
+
 [LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
 sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
 
-function cost = cost_fun(sys, gen_rated_power,iter)
+function cost = cost_fun(sys, gen_rated_power,iter,lag)
 
     % Assign the generated rated power 
     %   Which updates the power generated profiles
@@ -72,7 +92,7 @@ function cost = cost_fun(sys, gen_rated_power,iter)
    
     % Smart flow battery charge and discharge rule that minimizes the
     % number of times the battery switches from charging to dischargin
-    charge_flow = smooth(-deficit, 25);
+    charge_flow = smooth(-deficit, lag);
     %%
     
     % Have the LIB pick up the slack of when the flow battery wasn't able
@@ -87,7 +107,8 @@ function cost = cost_fun(sys, gen_rated_power,iter)
     %charge_lib * iter/100
     %charge_SC * (100-iter)/100
     
-    
+ 
+
    %% 
     
     % Assign the independent variables to the model
