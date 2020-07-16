@@ -144,7 +144,7 @@ P_tidal_profile = (sin(k/6.2*2*pi)+1)/2 ... short time-scale
 % Construct generator
 tidal_gen = IslandGenRenewable('tidal', tidal_cost_P, tidal_lifetime, k, P_tidal_profile);
 
-% Generator SOLAR
+%% Generator SOLAR
 
 % Cost per rated kW
 %   From doi:10.1016/j.energy.2016.03.123

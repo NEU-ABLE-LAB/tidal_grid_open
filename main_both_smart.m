@@ -15,6 +15,16 @@ lag = 1;
 
 %%
 %replace with fmincon???
+x0 = 1E3; % Initital generator rated power
+fmincon_options = optimoptions(@fmincon, ...
+    'Display','iter', ...
+    'PlotFcn', {@optimplotfval,@optimplotstepsize},...
+    'FiniteDifferenceStepSize',1);
+[x, fval] = fmincon(@(x)(calcChargeError(sys,x,lag) ), ...
+    x0, [],[],[],[], 1,1E9, [], fmincon_options);
+
+
+
 while 1
     gen_rated_power = iter; % kW
 
@@ -36,6 +46,19 @@ while 1
     iter=iter+stage;% increase iter by stage
 end
 
+% fmincon_options = optimoptions(@fmincon, ...
+%     'Display','iter', ...
+%     'PlotFcn', {@optimplotfval,@optimplotstepsize},...
+%     'FiniteDifferenceStepSize',1);
+% 
+% x0 = 
+% lb = 
+% ub = 
+% A = 
+% b = 
+
+
+
 fmincon_options = optimoptions(@fmincon, ...
     'Display','iter', ...
     'PlotFcn', {@optimplotfval,@optimplotstepsize},...
@@ -49,11 +72,22 @@ fmincon_options = optimoptions(@fmincon, ...
    Aeq = [];
    beq = [];
    nonlcon = [];%@unitdesk;
-[x,fval]=fmincon (@(x) (cost_fun(sys,gen_rated_power,x(1))), x0, A, b, Aeq, beq, lb, ub, nonlcon,fmincon_options);
+[x,fval]=fmincon (@(x) (cost_fun(sys,gen_rated_power,x)), x0, A, b, Aeq, beq, lb, ub, nonlcon,fmincon_options);
 
 [LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
 sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
 
+%% calcChargeError
+function chargeError = calcChargeError(sys, gen_rated_power, lag)
+
+    cost_fun(sys, gen_rated_power,lag);
+
+    chargeError = sqrt(sum(cellfun(@(x)(x.charge(1) - x.charge(end)), ...
+        sys.batts(2) ).^2));
+    
+end
+
+%% cost_fun
 function cost = cost_fun(sys, gen_rated_power,lag)
 
     % Assign the generated rated power 
