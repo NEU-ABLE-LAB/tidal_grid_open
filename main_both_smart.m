@@ -12,8 +12,9 @@
 iter=0;% iterator value
 stage=1000000;% difference value at various stages
 lag = 1;
-iter =1;
 
+%%
+%replace with fmincon???
 while 1
     gen_rated_power = iter; % kW
 
@@ -23,7 +24,7 @@ while 1
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
 
-    cost_fun(sys, gen_rated_power,1,1);
+    cost_fun(sys, gen_rated_power,lag);
 
     if (sys.batts{1,2}.charge(1) - sys.batts{1,2}.charge(end) <= stage)% if the difference between start and end charge is less then the current stage...
         if (stage == 1)% if on the lowest stage...
@@ -35,56 +36,30 @@ while 1
     iter=iter+stage;% increase iter by stage
 end
 
+fmincon_options = optimoptions(@fmincon, ...
+    'Display','iter', ...
+    'PlotFcn', {@optimplotfval,@optimplotstepsize},...
+    'FiniteDifferenceStepSize',1);
 
-
-%%
-% for iter = 1:100
-%     cost_fun(sys, gen_rated_power,iter);
-%     x(iter)=sys.LCOE();
-% end
-% [~,index] = min(x);
-% cost_fun(sys, gen_rated_power,x(index))
-
-
-% for lag = 1:8760
-%     cost_fun(sys, gen_rated_power,y(mindex),lag);
-%     x(lag)=sys.LCOE();
-% end
-% [~,index] = min(x);
-% cost_fun(sys, gen_rated_power,y(mindex),x(index));
-
-
-
-%cost_fun(sys, gen_rated_power,1);
-
-
-%fun = cost_fun(sys, gen_rated_power,x);
-  
-   x0 = [0];
-   lb = zeros(size(x0));
-   ub = [];
+   x0 = [23];
+   lb = [1];
+   ub = [8760];
    A = [];
    b = [];
    Aeq = [];
    beq = [];
    nonlcon = [];%@unitdesk;
-for iter = 1:100
-   fmincon (@(x) (cost_fun(sys,gen_rated_power,iter,x)), x0, A, b, Aeq, beq, lb, ub, nonlcon);
-   x_array(iter) = sys.LCOE();
-end
-[~, index] = min(x_array)
-fmincon (@(x) (cost_fun(sys,gen_rated_power,iter,x)), x0, A, b, Aeq, beq, lb, ub, nonlcon);
-  
-
+[x,fval]=fmincon (@(x) (cost_fun(sys,gen_rated_power,x(1))), x0, A, b, Aeq, beq, lb, ub, nonlcon,fmincon_options);
 
 [LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
 sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
 
-function cost = cost_fun(sys, gen_rated_power,iter,lag)
+function cost = cost_fun(sys, gen_rated_power,lag)
 
     % Assign the generated rated power 
     %   Which updates the power generated profiles
     sys.gens{1}.rated_power = gen_rated_power;
+    sys.gens{2}.rated_power = 0;
     
     % Calculate the deficit at each hour, assuming no battery
     deficit = sys.demand - sys.supply;
@@ -96,18 +71,9 @@ function cost = cost_fun(sys, gen_rated_power,iter,lag)
     %%
     
     % Have the LIB pick up the slack of when the flow battery wasn't able
-    % to charge or discharge to meet over supply or over demand
-    rem_deficit = -(sys.demand(1:end-1) + charge_flow - sys.supply(1:end-1));
-    
-    charge_lib = rem_deficit*(iter/100); 
-    
-    charge_SC = rem_deficit*((100-iter)/100);
-    %forloop 1,100
-    %iter/100 = %
-    %charge_lib * iter/100
-    %charge_SC * (100-iter)/100
-    
- 
+    % to charge or discharge to meet over supply or over demand    
+    charge_lib = -(sys.demand(1:end-1) + charge_flow - sys.supply(1:end-1));
+
 
    %% 
     
@@ -115,7 +81,7 @@ function cost = cost_fun(sys, gen_rated_power,iter,lag)
     %   gen.rated_power - scalar rated power of generator
     %   bat(%LIB%).charge_rate  - charge rate of LIB at each hour
     %   bat(%flow%).charge_rate - charge rate of flow batt at each hour
-    sys.opt('x',[gen_rated_power; charge_lib; charge_flow; charge_SC])
+    sys.opt('x',[gen_rated_power;0.25*gen_rated_power; charge_lib; charge_flow; 0*charge_flow])
     
     % Calculate the LCOE
     cost = sys.LCOE();
