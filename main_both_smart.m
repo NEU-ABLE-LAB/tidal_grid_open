@@ -13,15 +13,17 @@ iter=0;% iterator value
 stage=1000000;% difference value at various stages
 lag = 1;
 
-%%
-%replace with fmincon???
-x0 = 1E3; % Initital generator rated power
-fmincon_options = optimoptions(@fmincon, ...
-    'Display','iter', ...
-    'PlotFcn', {@optimplotfval,@optimplotstepsize},...
-    'FiniteDifferenceStepSize',1);
-[x, fval] = fmincon(@(x)(calcChargeError(sys,x,lag) ), ...
-    x0, [],[],[],[], 1,1E9, [], fmincon_options);
+% %%
+% %replace with fmincon???
+% sys = make_island_aspirational('simple flow');
+% 
+% x0 = 1E3; % Initital generator rated power
+% fmincon_options = optimoptions(@fmincon, ...
+%     'Display','iter', ...
+%     'PlotFcn', {@optimplotfval,@optimplotstepsize},...
+%     'FiniteDifferenceStepSize',1);
+% [x, fval] = fmincon(@(x)(calcChargeError(sys,x,lag,0) ), ...
+%     x0, [],[],[],[], 1,1E9, [], fmincon_options);
 
 
 
@@ -29,12 +31,12 @@ while 1
     gen_rated_power = iter; % kW
 
 %% Make island
-    sys = make_island_aspirational('simple flow');
+    sys = make_island_aspirational('simple flow','grid_costs',5,'households',10000);
 
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
 
-    cost_fun(sys, gen_rated_power,lag);
+    cost_fun(sys, gen_rated_power,lag,100);
 
     if (sys.batts{1,2}.charge(1) - sys.batts{1,2}.charge(end) <= stage)% if the difference between start and end charge is less then the current stage...
         if (stage == 1)% if on the lowest stage...
@@ -64,18 +66,22 @@ fmincon_options = optimoptions(@fmincon, ...
     'PlotFcn', {@optimplotfval,@optimplotstepsize},...
     'FiniteDifferenceStepSize',1);
 
-   x0 = [23];
-   lb = [1];
-   ub = [8760];
+   x0 = [23,50];
+   lb = [1,0];
+   ub = [8760,100];
    A = [];
    b = [];
    Aeq = [];
    beq = [];
    nonlcon = [];%@unitdesk;
-[x,fval]=fmincon (@(x) (cost_fun(sys,gen_rated_power,x)), x0, A, b, Aeq, beq, lb, ub, nonlcon,fmincon_options);
+[x,fval]=fmincon (@(x) (cost_fun(sys,gen_rated_power,x(1),x(2))), x0, A, b, Aeq, beq, lb, ub, nonlcon,fmincon_options);
 
+cost_fun(sys,gen_rated_power,25,100)
 [LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
 sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
+
+% x(2) = split 
+
 
 %% calcChargeError
 function chargeError = calcChargeError(sys, gen_rated_power, lag)
@@ -88,7 +94,7 @@ function chargeError = calcChargeError(sys, gen_rated_power, lag)
 end
 
 %% cost_fun
-function cost = cost_fun(sys, gen_rated_power,lag)
+function cost = cost_fun(sys, gen_rated_power,lag,splt)
 
     % Assign the generated rated power 
     %   Which updates the power generated profiles
@@ -115,7 +121,7 @@ function cost = cost_fun(sys, gen_rated_power,lag)
     %   gen.rated_power - scalar rated power of generator
     %   bat(%LIB%).charge_rate  - charge rate of LIB at each hour
     %   bat(%flow%).charge_rate - charge rate of flow batt at each hour
-    sys.opt('x',[gen_rated_power;0.25*gen_rated_power; charge_lib; charge_flow; 0*charge_flow])
+    sys.opt('x',[((100-splt)/100)*gen_rated_power; (splt/100)*gen_rated_power; charge_lib; charge_flow; 0*charge_flow])
     
     % Calculate the LCOE
     cost = sys.LCOE();
