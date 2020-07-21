@@ -76,7 +76,7 @@ fmincon_options = optimoptions(@fmincon, ...
    nonlcon = [];%@unitdesk;
 [x,fval]=fmincon (@(x) (cost_fun(sys,gen_rated_power,x(1),x(2))), x0, A, b, Aeq, beq, lb, ub, nonlcon,fmincon_options);
 
-cost_fun(sys,gen_rated_power,25,100)
+%cost_fun(sys,gen_rated_power,25,100)
 [LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
 sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
 
@@ -98,8 +98,8 @@ function cost = cost_fun(sys, gen_rated_power,lag,splt)
 
     % Assign the generated rated power 
     %   Which updates the power generated profiles
-    sys.gens{1}.rated_power = gen_rated_power;
-    sys.gens{2}.rated_power = 0;
+    sys.gens{1}.rated_power = ((100-splt)/100)*gen_rated_power;
+    sys.gens{2}.rated_power = (splt/100)*gen_rated_power;
     
     % Calculate the deficit at each hour, assuming no battery
     deficit = sys.demand - sys.supply;
