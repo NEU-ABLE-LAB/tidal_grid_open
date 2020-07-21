@@ -160,7 +160,7 @@ x=DC_solar_hourly/1000;
 P_solar_profile = x;
 
 % Construct generator
-solar_gen = IslandGenRenewable('tidal', solar_cost_P, solar_lifetime, k, P_solar_profile);
+solar_gen = IslandGenRenewable('solar', solar_cost_P, solar_lifetime, k, P_solar_profile);
 
 
 
@@ -168,7 +168,7 @@ solar_gen = IslandGenRenewable('tidal', solar_cost_P, solar_lifetime, k, P_solar
 
 grid_costs = p.Results.grid_costs; % ($/kWh)
 
-sys = IslandSys(name, t, {tidal_gen, solar_gen}, {bat_LIB, bat_flow, bat_SC}, {demand}, ...
+sys = IslandSys(name, t, {solar_gen, tidal_gen}, {bat_LIB, bat_flow, bat_SC}, {demand}, ...
     grid_costs);
 
 end

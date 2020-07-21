@@ -31,12 +31,12 @@ while 1
     gen_rated_power = iter; % kW
 
 %% Make island
-    sys = make_island_aspirational('simple flow','grid_costs',5,'households',10000);
+    sys = make_island_aspirational('simple flow','grid_costs',5);
 
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
 
-    cost_fun(sys, gen_rated_power,lag,100);
+    cost_fun(sys, gen_rated_power,lag,0);
 
     if (sys.batts{1,2}.charge(1) - sys.batts{1,2}.charge(end) <= stage)% if the difference between start and end charge is less then the current stage...
         if (stage == 1)% if on the lowest stage...
@@ -64,9 +64,9 @@ end
 fmincon_options = optimoptions(@fmincon, ...
     'Display','iter', ...
     'PlotFcn', {@optimplotfval,@optimplotstepsize},...
-    'FiniteDifferenceStepSize',1);
+    'FiniteDifferenceStepSize',1E-9);
 
-   x0 = [23,50];
+   x0 = [23,100];
    lb = [1,0];
    ub = [8760,100];
    A = [];
