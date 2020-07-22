@@ -26,9 +26,9 @@ lag = 1;
 %     x0, [],[],[],[], 1,1E9, [], fmincon_options);
 
 
-
+for l = 1:100
 while 1
-    gen_rated_power = iter; % kW
+    gen_rated_power(l) = iter; % kW
 
 %% Make island
     sys = make_island_aspirational('simple flow','grid_costs',5);
@@ -36,7 +36,8 @@ while 1
 %% Size simple LIB system
 %   Have the LIB supply any deficit, and size the generator to reduce LCOE
 
-    cost_fun(sys, gen_rated_power,lag,0);
+    cost_fun(sys, gen_rated_power(l),lag,l);
+    disp(l);
 
     if (sys.batts{1,2}.charge(1) - sys.batts{1,2}.charge(end) <= stage)% if the difference between start and end charge is less then the current stage...
         if (stage == 1)% if on the lowest stage...
@@ -46,6 +47,7 @@ while 1
         stage = stage/10;% ...reduce the stage on level
     end
     iter=iter+stage;% increase iter by stage
+end
 end
 
 % fmincon_options = optimoptions(@fmincon, ...
@@ -60,13 +62,13 @@ end
 % b = 
 
 
-
 fmincon_options = optimoptions(@fmincon, ...
     'Display','iter', ...
     'PlotFcn', {@optimplotfval,@optimplotstepsize},...
     'FiniteDifferenceStepSize',1E-9);
-
-   x0 = [23,100];
+% for j = 1:100;
+% for k = 1:100;
+   x0 = [j,k];
    lb = [1,0];
    ub = [8760,100];
    A = [];
@@ -75,10 +77,15 @@ fmincon_options = optimoptions(@fmincon, ...
    beq = [];
    nonlcon = [];%@unitdesk;
 [x,fval]=fmincon (@(x) (cost_fun(sys,gen_rated_power,x(1),x(2))), x0, A, b, Aeq, beq, lb, ub, nonlcon,fmincon_options);
+saveX(k,:) = x;
+saveFVAL(k) = fval;
+cost_fun(sys,gen_rated_power,25,100);
+[LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(false);
+%sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)));
+end
+save(j,:) = {saveX,saveFVAL};
+end
 
-%cost_fun(sys,gen_rated_power,25,100)
-[LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
-sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)))
 
 % x(2) = split 
 
