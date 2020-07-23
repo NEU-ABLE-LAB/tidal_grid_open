@@ -21,14 +21,9 @@ ObjectiveFunction = @cost_fun;
 nvars = 2;
 lb = [1,0];
 ub = [8760,100];
-tic
-for j = 1:10:8760
-    x0 = [j,0];
-    [x,fval] = patternsearch(@(x) cost_fun(sys,gen_rated_power(floor(x(2)+1)),x(1),x(2)),x0,[],[],[],[],lb,ub);
-    xSave(j,:) = x;
-    fvalSave(j,:) = fval;
-end
-kesselRun = toc
+x0 = [863,96];
+[x,fval] = patternsearch(@(x) cost_fun(sys,gen_rated_power(floor(x(2)+1)),x(1),x(2)),x0,[],[],[],[],lb,ub);
+    
 cost_fun(sys,gen_rated_power(floor(x(2)+1)),x(1),x(2));
 [LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
 sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)));
