@@ -40,12 +40,12 @@ options.InitialPopulationMatrix = [0,100];
 
 ObjectiveFunction = @cost_fun;
 nvars = 2;
-x0 = [23,0];
+x0 = [23,100];
 lb = [1,0];
 ub = [8760,100];
 
-%[x,fval] = ga(@(x) cost_fun(sys,gen_rated_power,x(1),x(2)),nvars,[],[],[],[],lb,ub);
-[x,fval] = patternsearch(@(x) cost_fun(sys,gen_rated_power,x(1),x(2)),x0,[],[],[],[],lb,ub);
+[x,fval] = ga(@(x) cost_fun(sys,gen_rated_power,x(1),x(2)),nvars,[],[],[],[],lb,ub);
+[x,fval] = patternsearch(@(x) cost_fun(sys,gen_rated_power,x(1),x(2)),x0
 
 cost_fun(sys,gen_rated_power,x(1),x(2));
 [LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(false);
