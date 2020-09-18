@@ -22,7 +22,8 @@ nvars = 2;
 lb = [1,0];
 ub = [8760,100];
 x0 = [863,96];
-[x,fval] = patternsearch(@(x) cost_fun(sys,gen_rated_power(floor(x(2)+1)),x(1),x(2)),x0,[],[],[],[],lb,ub);
+[x,fval] = patternsearch(@(x) cost_fun(sys, ...
+    gen_rated_power(floor(x(2)+1)),x(1),x(2)),x0,[],[],[],[],lb,ub);
     
 cost_fun(sys,gen_rated_power(floor(x(2)+1)),x(1),x(2));
 [LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
