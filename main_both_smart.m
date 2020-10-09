@@ -82,9 +82,9 @@ saveFVAL(k) = fval;
 cost_fun(sys,gen_rated_power,25,100);
 [LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(false);
 %sys.plot(sprintf('LCOE: %.1f %s/kWh', LCOE*100,  char(0162)));
-end
-save(j,:) = {saveX,saveFVAL};
-end
+% end
+% save(j,:) = {saveX,saveFVAL};
+% end
 
 
 % x(2) = split 
