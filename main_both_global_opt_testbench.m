@@ -16,7 +16,7 @@ options = optimoptions('patternsearch','Display','iter',...
     'UseCompletePoll',true,'ConstraintTolerance',0.1,...
     'OutputFcn',@stopfn,'StepTolerance',1e-9);
 
-testSize = 100
+testSize = 100;
 tmp = [];
 rownames = {'fminunc';'patternSearch';'genericAlgorithim';'particleSwarm'};
 gen_rated_power = {tmp;tmp;tmp;tmp};
@@ -85,12 +85,19 @@ end
 tb({'particleSwarm'},:) = [{x(:,1)},{x(:,2)},{x(:,3)},{fval},{rt}]; 
 
 fmin_LCOE_avg = mean(tb{{'fminunc'},:}{4});
+fmin_LCOE_std = std(tb{{'fminunc'},:}{4});
 fmin_runtime_avg = mean(tb{{'fminunc'},:}{5});
+
 pattern_LCOE_avg = mean(tb{{'patternSearch'},:}{4});
+pattern_LCOE_std = std(tb{{'patternSearch'},:}{4});
 pattern_runtime_avg = mean(tb{{'patternSearch'},:}{5});
+
 ga_LCOE_avg = mean(tb{{'genericAlgorithim'},:}{4});
+ga_LCOE_std = std(tb{{'genericAlgorithim'},:}{4});
 ga_runtime_avg = mean(tb{{'genericAlgorithim'},:}{5});
+
 particle_LCOE_avg = mean(tb{{'particleSwarm'},:}{4});
+particle_LCOE_std = std(tb{{'particleSwarm'},:}{4});
 particle_runtime_avg = mean(tb{{'particleSwarm'},:}{5});
 
 X = categorical({'fminunc','pattern','ga','particle'});
@@ -100,6 +107,13 @@ hold on
 bar(X,[fmin_LCOE_avg pattern_LCOE_avg ga_LCOE_avg particle_LCOE_avg])
 title('Average LCOE')
 hold off
+
+figure()
+hold on
+bar(X,[fmin_LCOE_std pattern_LCOE_std ga_LCOE_std particle_LCOE_std])
+title('Standard Deviation')
+hold off
+
 figure()
 hold on
 title('Average Runtime')
