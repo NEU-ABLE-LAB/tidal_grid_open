@@ -1,10 +1,4 @@
-clear
-clc
-%MAIN_BOTH_SIMPLE Simulate a simple island
-%   Size a single LIB and a single flow battery and generator to meet
-%   demand using a simple charge law of charge when supply>demand, and
-%   discharge otherwise.
-
+function
 %% Parameters
 % Generator
 sys = make_island_aspirational('global optimized tidal/solar & LIB/flow','grid_costs',5);

@@ -18,7 +18,7 @@ options = optimoptions('patternsearch','Display','iter',...
     'OutputFcn',@stopfn,'StepTolerance',1e-9);
 
 ObjectiveFunction = @cost_fun;
-nvars = 2;
+nvars = 3;
 lb = [1,1,1]; %lowest possible value for pattern search
 ub = [6,8760/4,95]; %highest possible value for pattern search
 
