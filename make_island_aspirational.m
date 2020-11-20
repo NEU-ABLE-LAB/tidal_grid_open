@@ -11,7 +11,7 @@ addOptional(p,'name','Aspirational',@isstr);
 addParameter(p,'d_profile_fName',...
     'data/OI_darthrmwh_iso_4005_20190101_20191231',...
     @isstr)
-addParameter(p,'households',449)
+addParameter(p,'households',429)
 
 % LIB inputs
 addParameter(p,'LIB_cost_E',220);% ($/kWh)
@@ -58,11 +58,11 @@ d_profile = d_profile.data;
 households = p.Results.households; 
 
 % Scale total demand to 8 GWh
-%  Avg US home uses ~914 kWh/mo
+%  Avg US home uses ~10,649 kWh/yr
 %   https://www.eia.gov/tools/faqs/faq.php?id=97&t=3
-%  Block island has 449 households
+%  Block island has 429 households
 %   https://www.point2homes.com/US/Neighborhood/RI/New-Shoreham/Block-Island-Demographics.html
-d_US_household = 914E3;% 914kWh
+d_US_household = 10649E3;% (Wh) 10,649 kWh/yr
 d_yr_tot = d_US_household * households; % Yearly energy consumption (Wh)
 d_profile = d_profile * d_yr_tot / sum(d_profile);
 
