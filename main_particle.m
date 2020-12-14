@@ -1,15 +1,15 @@
-%MAIN_GA Optimize battery and generator sizes using genetic algorithm
+%MAIN_particle Optimize battery and generator sizes using particle swarm
 %   Size a single LIB and generator to meet demand using a simple charge
 %   law of charge when supply>demand, and discharge otherwise.
 
 %% Make island
-sys = make_island_aspirational('Genetic Algorithm');
+sys = make_island_aspirational('Partical Swarm');
 
-%% GA Optimization
+%% Particle Swarm Optimization
 % The independent variables are
-%   (1) log10(gen_rated_power_total)
-%   (2) battery_filter_span
-%   (3) gen_rated_power_split
+%   log10(gen_rated_power_total)
+%   battery_filter_span
+%   gen_rated_power_split
 
 % Cost function
 fun = @(x)cost_fun_design(sys, ...
@@ -28,19 +28,19 @@ ub = [ ...
         ... gen_rated_power_total upper bound
         log10(sum(cellfun(@(x)(x.MAX_RATED_POWER),sys.gens))), ...
         ... battery_filter_span upper bound
-        8760, ...
+        10*8760, ...
         ... gen_rated_power_split upper bound
         100 ...
     ];
 
 % Optimization options
 options = optimoptions( ...
-   'ga', ... name
+   'particleswarm', ... name
    'Display', 'iter', ...
-   'PlotFcn', 'gaplotbestf');
+   'PlotFcn', 'pswplotbestf');
 
 % Run the partical swarm optimization
-x = ga(fun, nvars, [],[],[],[],lb, ub, [], options);
+x = particleswarm(fun, nvars, lb, ub, options);
 
 %% Plot results
 [LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);

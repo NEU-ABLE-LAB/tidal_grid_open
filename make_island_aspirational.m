@@ -11,33 +11,38 @@ addOptional(p,'name','Aspirational',@isstr);
 addParameter(p,'d_profile_fName',...
     'data/OI_darthrmwh_iso_4005_20190101_20191231',...
     @isstr)
+%  Avg US home uses ~10,649 kWh/yr
+%   https://www.eia.gov/tools/faqs/faq.php?id=97&t=3
+addParameter(p,'household_annual_kWh', 10649)
+%  Block island has 429 households
+%   https://www.point2homes.com/US/Neighborhood/RI/New-Shoreham/Block-Island-Demographics.html
 addParameter(p,'households',429)
 
 % LIB inputs
-addParameter(p,'LIB_cost_E',220);% ($/kWh)
-addParameter(p,'LIB_cost_P',0); % ($/kW)
+addParameter(p,'LIB_cost_E',220); % ($/kWh)
+addParameter(p,'LIB_cost_P',0);   % ($/kW)
 addParameter(p,'LIB_cycle_life',4000); % (total charges)
 
 % flow inputs
-addParameter(p,'flow_cost_E',30); % ($/kWh)
+addParameter(p,'flow_cost_E',30);   % ($/kWh)
 addParameter(p,'flow_cost_P',1000); % ($/kW)
 addParameter(p,'flow_cycle_life',12000); % (charge and discharge switches)
 
 % SC inputs
 addParameter(p,'SC_cost_E',2400); % ($/kWh) https://tinyurl.com/yavcuy3p 
-addParameter(p,'SC_cost_P',300); % ($/kW)
+addParameter(p,'SC_cost_P',300);  % ($/kW)
 addParameter(p,'SC_cycle_life',20000);% https://tinyurl.com/ybol85ml
 
 % tidal inputs
-addParameter(p,'tidal_cost_P',4300); % ($/kWh)
-addParameter(p,'tidal_lifetime',20);
+addParameter(p,'tidal_cost_P',4300); % ($/kW)
+addParameter(p,'tidal_lifetime',20); % (yrs)
 
 % solar inputs
-addParameter(p,'solar_cost_P',2800);
-addParameter(p,'solar_lifetime',30)
+addParameter(p,'solar_cost_P',2800); % ($/kW)
+addParameter(p,'solar_lifetime',30)  % (yrs)
 
 % island inputs
-addParameter(p,'grid_costs',5);
+addParameter(p,'grid_costs',5); % ($/kWh)
 
 % Parse inputs
 parse(p,name,varargin{:})
@@ -55,23 +60,20 @@ d_profile = load(p.Results.d_profile_fName, ...
 t = d_profile.t;
 d_profile = d_profile.data;
 
-households = p.Results.households; 
-
-% Scale total demand to 8 GWh
-%  Avg US home uses ~10,649 kWh/yr
-%   https://www.eia.gov/tools/faqs/faq.php?id=97&t=3
-%  Block island has 429 households
-%   https://www.point2homes.com/US/Neighborhood/RI/New-Shoreham/Block-Island-Demographics.html
-d_US_household = 10649E3;% (Wh) 10,649 kWh/yr
-d_yr_tot = d_US_household * households; % Yearly energy consumption (Wh)
+% Scale total load to households
+%   Yearly energy consumption (kWh/yr)
+d_yr_tot = p.Results.household_annual_kWh * p.Results.households; 
+% Hourly demand (kWh/hr)
 d_profile = d_profile * d_yr_tot / sum(d_profile);
 
 % Specify time vector
 k = (0:length(d_profile)-1)';
 
 % Create demand object
-demand = IslandDemand('8GWh ISO NE', k, d_profile);
+demand = IslandDemand('ISO NE scaled', k, d_profile);
 
+fprintf('Total demand: %.0f (kWh/yr)\n', d_yr_tot)
+fprintf('Peak demand: %.0f (kW)\n', max(d_profile))
 
 %% LIB
 
@@ -108,21 +110,6 @@ flow_cycle_life = p.Results.flow_cycle_life;% cycles
 % Construct battery
 bat_flow = IslandBatteryFlow('flow', flow_cost_E, flow_cost_P, flow_cycle_life, k);
 
-
-%% Flow battery
-
-% Super capacitor energy capacity cost ($/kWh)
-SC_cost_E = p.Results.SC_cost_E;% ($/kWh)
-
-% Super capacitor power capacity cost ($/kW)
-SC_cost_P = p.Results.SC_cost_P;% ($/kW)
-
-% Seuper capacitor cycle life (cycles)
-SC_cycle_life = p.Results.SC_cycle_life;% cycles
-
-% Construct battery
-bat_SC = IslandBatterySC('SC', SC_cost_E, SC_cost_P, SC_cycle_life, k);
-
 %% Generator TIDAL
 
 % Cost per rated kW
@@ -155,21 +142,23 @@ solar_cost_P = p.Results.solar_cost_P;% ($/kW)
 solar_lifetime = p.Results.solar_lifetime;% (years)
 
 % Generation profile
-load('data/DC_solar_hourly.mat');
-x=DC_solar_hourly/1000;
-P_solar_profile = x;
+DC_solar_hourly = load('data/DC_solar_hourly.mat');
+DC_solar_hourly = DC_solar_hourly.DC_solar_hourly;
+% Convert for Watts to kW
+P_solar_profile = DC_solar_hourly/1000;
 
 % Construct generator
 solar_gen = IslandGenRenewable('solar', solar_cost_P, solar_lifetime, k, P_solar_profile);
-
-
 
 %% Island system
 
 grid_costs = p.Results.grid_costs; % ($/kWh)
 
-sys = IslandSys(name, t, {tidal_gen,solar_gen}, {bat_LIB, bat_flow, bat_SC}, {demand}, ...
-    grid_costs);
+sys = IslandSys(name, t, ...
+    {tidal_gen,solar_gen}, ... Generators
+    {bat_LIB, bat_flow}, ... Batteries
+    {demand}, ... Demand
+    grid_costs); % Costs
 
 end
 
