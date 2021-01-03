@@ -17,7 +17,8 @@ max_LCOE = 100; % ($/kWh)
 % island_base = @make_island_Zakeri2015;
 % island_base = @make_island_PNNL2019_2018;
 % island_base = @make_island_PNNL2019_2025;
-island_base = @make_island_Brushett2020_2018;
+% island_base = @make_island_Brushett2020_2018;
+island_base = @make_island_Brushett2020_2025;
 
 % Devices to install
 install_solar = [true  true  true  false];
