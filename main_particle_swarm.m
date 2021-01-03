@@ -1,4 +1,6 @@
-%MAIN_particle Optimize battery and generator sizes using particle swarm
+%MAIN_particle_swarm Determine ideal size of swarm to optimize battery and
+%generator sizes using particle swarm
+%
 %   Size a single LIB and generator to meet demand using a simple charge
 %   law of charge when supply>demand, and discharge otherwise.
 
