@@ -1,6 +1,6 @@
 classdef IslandSys < IslandPart
     %ISLANDSYS An islanded power system object
-    
+       
     properties (SetAccess = immutable)
 
         % Island name
@@ -45,7 +45,7 @@ classdef IslandSys < IslandPart
         demands %TODO-validate {mustBeArrayFromClass(demands, 'IslandDemand')}
         
     end
-    
+        
     properties (Dependent)
         
         % All the system parts in the order of `gens`, `batts`, `demands`
@@ -62,6 +62,15 @@ classdef IslandSys < IslandPart
         
         % Curtailed power
         curtailed
+        
+    end
+    
+    properties
+        
+        % Battery controller model
+        %TODO make this a IslandPart instead of split between
+        %`cost_fun_design` and `IslandSys.LCOE`
+        battery_filter_span
         
     end
     
@@ -206,7 +215,7 @@ classdef IslandSys < IslandPart
     methods
         
         % Calculate the LCOE of the islanded power system
-        [LCOE, LCOE_parts, LCOE_parts_names] = LCOE(obj, doPlot) 
+        [LCOE, LCOE_parts, LCOE_parts_names, summary] = LCOE(obj, doPlot) 
         
         % Plot the system
         sys_plot(obj)

@@ -2,47 +2,72 @@
 %   Size a single LIB and generator to meet demand using a simple charge
 %   law of charge when supply>demand, and discharge otherwise.
 
-%% Make island
-sys = make_island_aspirational('Partical Swarm');
+%% Parameters
+configs = struct('name',{}, 'island_base',{}, 'params',{});
 
-%% Particle Swarm Optimization
-% The independent variables are
-%   log10(gen_rated_power_total)
-%   battery_filter_span
-%   gen_rated_power_split
+% 2018 Cost estimates for batteries, with Brushett2020 flow battery cost model
+configs(end+1) = struct( ...
+    'name', 'Brushett2020_2018' ...
+    ,'island_base', @make_island_Brushett2020_2018 ...
+    ,'params', {{}} ...
+);
 
-% Cost function
-fun = @(x)cost_fun_design(sys, ...
-        10^x(1), ... gen_rated_power_total
-        x(2), ... battery_filter_span
-        x(3) ... gen_rated_power_split
-    );
+% 2025 Cost estimates for batteries, with Brushett2020 flow battery cost model
+configs(end+1) = struct( ...
+    'name', 'Brushett2020_2025' ...
+    ,'island_base', @make_island_Brushett2020_2025 ...
+    ,'params', {{}} ...
+);
 
-nvars = 3;
+% Total number of configurations to test
+n_configs = length(configs);
+    
 
-% Lower bound
-lb = [log10(1); 1; 0];
+%% Optimize each island type
+syss = cell(1,n_configs);
+problems = cell(1,n_configs);
+solutions = cell(1,n_configs);
+summaries = cell(1,n_configs);
 
-% Upper bound
-ub = [ ...
-        ... gen_rated_power_total upper bound
-        log10(sum(cellfun(@(x)(x.MAX_RATED_POWER),sys.gens))), ...
-        ... battery_filter_span upper bound
-        10*8760, ...
-        ... gen_rated_power_split upper bound
-        100 ...
-    ];
+for config_n = 1:n_configs
 
-% Optimization options
-options = optimoptions( ...
-   'particleswarm', ... name
-   'Display', 'iter', ...
-   'PlotFcn', 'pswplotbestf');
+    %% Make island
+    
+    name = configs(config_n).name;
+    island_base = configs(config_n).island_base;
+    params = configs(config_n).params;
+        
+    sys = island_base(['Partical Swarm - ' name], params{:});
+    
+    %% Particle Swarm Optimization
 
-% Run the partical swarm optimization
-x = particleswarm(fun, nvars, lb, ub, options);
+    % Formulate problem
+    problem = sys2prob(sys);
 
-%% Plot results
-[LCOE, LCOE_parts, LCOE_parts_names] = sys.LCOE(true);
-sys.plot(sprintf('LCOE: %.1f %s/kW', LCOE*100,  char(0162)))
+    % Optimization options
+    options = optimoptions( ...
+       'particleswarm', ... name
+       'HybridFcn','fmincon', ...
+       ... Increased swarm size from default of 100 to encourage exploration
+       'SwarmSize', 500, ... 
+       'Display', 'iter', ...
+       'UseParallel', true, ...
+       'PlotFcn', 'pswplotbestf');
 
+    % Run the partical swarm optimization
+    problem.solver = 'particleswarm';
+    problem.options = options;
+    [x,~,~,solution] = particleswarm(problem);
+    
+    %% Plot results
+    problem.objective(x);
+    [LCOE, LCOE_parts, LCOE_parts_names, summary] = sys.LCOE(true);
+    sys.plot(sprintf('LCOE: %.0f $/MWh', LCOE*1000))
+    
+    %% Save inputs and outputs
+    syss{config_n} = sys;
+    problems{config_n} = problem;
+    solutions{config_n} = solution;
+    summaries{config_n} = summary;
+    
+end
