@@ -195,7 +195,7 @@ end
 if nameValueArgs.install_solar
 
     % Generation profile
-    pvwattshourly = import_pvwatts_hourly("data\pvwatts_hourly.csv", ...
+    pvwattshourly = import_pvwatts_hourly("data/pvwatts_hourly.csv", ...
         [19, 19+8760-1]);
     % Convert for Watts to kW
     solar_P_profile = pvwattshourly.ACSystemOutputW/1000;
