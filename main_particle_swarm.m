@@ -4,6 +4,8 @@
 %   Size a single LIB and generator to meet demand using a simple charge
 %   law of charge when supply>demand, and discharge otherwise.
 
+confirmClearCloseAll
+
 %% Parameters
 
 % % 2018 Cost estimates for batteries, with Brushett2020 flow battery cost model
@@ -85,14 +87,30 @@ end
 %% RESULTS
 % On Discovery with 65 workers
 
+pathBase = ['output/' mfilename '_' datestr(now(),'yyyymmdd-hhMMss')];
+
+% Save workspace
+save([pathBase '.mat'])
+
+% Save Figures
+FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+for iFig = 1:length(FigList)
+  FigHandle = FigList(iFig);
+  FigName   = get(FigHandle, 'Name');
+  if isempty(FigName)
+      FigName = sprintf('Figure %d', FigHandle.Number);
+  end
+  savefig(FigHandle, [pathBase '_' FigName, '.fig']);
+end
+
 % LCOE variation with swarm Size
 % ==============================
 % (cellfun(@(x)(x.lcoe.total),summaries) - summaries{1}.lcoe.total)
-% 0   -0.0053776   -0.0062261   -0.0050337   -0.0054277
+% 0    0.0005   -0.0008   -0.0005   -0.0018
 
 % Timings
 % =======
 % swarmSizes
 % 100         266           708          1884        5012
 % timings
-% 71.517       52.043        67.37        111.7       225.34
+% 47.3228   42.5099   26.1115   47.4276  172.7048

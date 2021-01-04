@@ -4,6 +4,8 @@
 %   Size a single LIB and generator to meet demand using a simple charge
 %   law of charge when supply>demand, and discharge otherwise.
 
+confirmClearCloseAll
+
 %% Parameters
 
 % % 2018 Cost estimates for batteries, with Brushett2020 flow battery cost model
@@ -165,3 +167,19 @@ xlabel('Baseline cost multiplier')
 xlim([0.1 2])
 
 legend(strrep(lcoeParts','_',' '), 'Interpreter','Latex')
+
+pathBase = ['output/' mfilename '_' datestr(now(),'yyyymmdd-hhMMss')];
+
+% Save workspace
+save([pathBase '.mat'])
+
+% Save Figures
+FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+for iFig = 1:length(FigList)
+  FigHandle = FigList(iFig);
+  FigName   = get(FigHandle, 'Name');
+  if isempty(FigName)
+      FigName = sprintf('Figure %d', FigHandle.Number);
+  end
+  savefig(FigHandle, [pathBase '_' FigName, '.fig']);
+end

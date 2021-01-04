@@ -2,6 +2,8 @@
 %   Size a single LIB and generator to meet demand using a simple charge
 %   law of charge when supply>demand, and discharge otherwise.
 
+confirmClearCloseAll
+
 %% Parameters
 configs = struct('name',{}, 'island_base',{}, 'params',{});
 
@@ -48,7 +50,9 @@ for config_n = 1:n_configs
     options = optimoptions( ...
        'particleswarm', ... name
        'HybridFcn','fmincon', ...
-       'Display', 'iter', ...
+       'Display', 'final', ...
+       ... Increased swarm size from default of 100 to encourage exploration
+       'SwarmSize', 200, ... 
        'UseParallel', true, ...
        'PlotFcn', 'pswplotbestf');
 
@@ -68,4 +72,21 @@ for config_n = 1:n_configs
     solutions{config_n} = solution;
     summaries{config_n} = summary;
     
+end
+
+%% Results
+pathBase = ['output/' mfilename '_' datestr(now(),'yyyymmdd-hhMMss')];
+
+% Save workspace
+save([pathBase '.mat'])
+
+% Save Figures
+FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+for iFig = 1:length(FigList)
+  FigHandle = FigList(iFig);
+  FigName   = get(FigHandle, 'Name');
+  if isempty(FigName)
+      FigName = sprintf('Figure %d', FigHandle.Number);
+  end
+  savefig(FigHandle, [pathBase '_' FigName, '.fig']);
 end
