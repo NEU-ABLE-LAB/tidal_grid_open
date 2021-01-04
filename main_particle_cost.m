@@ -21,11 +21,14 @@ config_base = struct( ...
 );
 
 % Cost parameters to vary
-nSteps = 10;
-LIB_cost_E = 189+96*linspace(0.5,1.5,nSteps);
-flow_cost_P = linspace(0.5,1.5,nSteps);
-solar_cost_P = 2800*linspace(0.5,1.5,nSteps);
-tidal_cost_P = 4300*linspace(0.5,1.5,nSteps);
+nSteps = 20;
+costScaleMin = 0.1;
+costScaleMax = 2;
+costScale = linspace(costScaleMin, costScaleMax, nSteps);
+LIB_cost_E = 189+96*costScale;
+flow_cost_P = costScale;
+solar_cost_P = 2800*costScale;
+tidal_cost_P = 4300*costScale;
 
 clear configs
 configs(nSteps*4) = struct('name',{{}}, 'island_base',{{}}, 'params',{{}});
@@ -34,13 +37,13 @@ configs(nSteps*4) = struct('name',{{}}, 'island_base',{{}}, 'params',{{}});
 configs(0*nSteps+(1:nSteps)) = struct( ...
     'name', config_base.name ...
     ,'island_base', config_base.island_base ...
-    ,'params', arrayfun(@(x)({'LIB_cost_E_array',x}),LIB_cost_E, ...
+    ,'params', arrayfun(@(x)({'LIB_cost_E',x}),LIB_cost_E, ...
         'UniformOutput',false) ...
 );
 configs(1*nSteps+(1:nSteps)) = struct( ...
     'name', config_base.name ...
     ,'island_base', config_base.island_base ...
-    ,'params', arrayfun(@(x)({'flow_cost_P_array',x}),flow_cost_P, ...
+    ,'params', arrayfun(@(x)({'flow_cost_P',x}),flow_cost_P, ...
         'UniformOutput',false) ...
 );
 configs(2*nSteps+(1:nSteps)) = struct( ...
@@ -85,7 +88,9 @@ for config_n = 1:n_configs
     options = optimoptions( ...
        'particleswarm', ... name
        'HybridFcn','fmincon', ...
-       'Display', 'iter', ...
+       'Display', 'final', ...
+       ... Increased swarm size from default of 100 to encourage exploration
+       'SwarmSize', 200, ... 
        'UseParallel', true, ...
        'PlotFcn', 'pswplotbestf');
 
@@ -96,8 +101,8 @@ for config_n = 1:n_configs
     
     %% Plot results
     problem.objective(x);
-    [LCOE, LCOE_parts, LCOE_parts_names, summary] = sys.LCOE(true);
-    sys.plot(sprintf('LCOE: %.0f $/MWh', LCOE*1000))
+    [LCOE, LCOE_parts, LCOE_parts_names, summary] = sys.LCOE(false);
+%     sys.plot(sprintf('LCOE: %.0f $/MWh', LCOE*1000))
     
     %% Save inputs and outputs
     syss{config_n} = sys;
@@ -106,3 +111,57 @@ for config_n = 1:n_configs
     summaries{config_n} = summary;
     
 end
+
+%% Results
+
+% The parts of the LCOE to consider
+lcoeParts = {'tidal','solar', ...
+    'LIB_Energy','LIB_Power','LIB_error',...
+    'flow_Energy','flow_Power','flow_error','grid'};
+
+% Li-Ion Battery Cost
+figure('WindowStyle','docked')
+subplot(2,2,1)
+area(costScale, cell2mat( cellfun( ...
+    @(y)(cellfun(@(x)(y.lcoe.(x).cost),lcoeParts)),...
+    summaries((1:nSteps)+0*nSteps)',...
+    'UniformOutput',false)))
+title('Li-Ion Battery Cost')
+ylabel('LCOE ($/kW)')
+xlabel('Baseline cost multiplier')
+xlim([0.1 2])
+
+% Flow Battery Cost
+subplot(2,2,2)
+area(costScale, cell2mat( cellfun( ...
+    @(y)(cellfun(@(x)(y.lcoe.(x).cost),lcoeParts)),...
+    summaries((1:nSteps)+1*nSteps)',...
+    'UniformOutput',false)))
+title('Flow Battery Cost')
+ylabel('LCOE ($/kW)')
+xlabel('Baseline cost multiplier')
+xlim([0.1 2])
+
+% Solar PV Cost
+subplot(2,2,3)
+area(costScale, cell2mat( cellfun( ...
+    @(y)(cellfun(@(x)(y.lcoe.(x).cost),lcoeParts)),...
+    summaries((1:nSteps)+0*nSteps)',...
+    'UniformOutput',false)))
+title('Solar PV Cost')
+ylabel('LCOE ($/kW)')
+xlabel('Baseline cost multiplier')
+xlim([0.1 2])
+
+% Tidal Generator Cost
+subplot(2,2,4)
+area(costScale, cell2mat( cellfun( ...
+    @(y)(cellfun(@(x)(y.lcoe.(x).cost),lcoeParts)),...
+    summaries((1:nSteps)+0*nSteps)',...
+    'UniformOutput',false)))
+title('Tidal Generator Cost')
+ylabel('LCOE ($/kW)')
+xlabel('Baseline cost multiplier')
+xlim([0.1 2])
+
+legend(strrep(lcoeParts','_',' '), 'Interpreter','Latex')
