@@ -94,12 +94,12 @@ arguments
     nameValueArgs.install_solar (1,1) {mustBeNumericOrLogical} = true
     
     % Cost per rated power ($/kW)
-    %   From doi:10.1016/j.energy.2016.03.123
+    %   From https://www.nrel.gov/docs/fy19osti/72399.pdf
     nameValueArgs.solar_cost_P (1,1) {mustBePositive} ...
-        = 2800
+        = 1060
     
     % Lifetime of generator in years
-    %   default from doi:10.1016/j.energy.2016.03.123
+    %   From https://www.nrel.gov/docs/fy19osti/72399.pdf
     nameValueArgs.solar_lifetime (1,1) {mustBePositive,mustBeInteger} ...
         = 30    
     
