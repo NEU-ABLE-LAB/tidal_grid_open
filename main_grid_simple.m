@@ -1,5 +1,7 @@
 %MAIN_grid grid search a single battery and generator pair 
 
+confirmClearCloseAll
+
 %% Parameters
 
 % How much should the maximum generator rated power be scaled down
@@ -66,6 +68,22 @@ for installed_sys_N = 1:N_installed
     solutions{installed_sys_N} = solution;
     summaries{installed_sys_N} = summary;
 
+end
+
+pathBase = ['output/' mfilename '_' datestr(now(),'yyyymmdd-hhMMss')];
+
+% Save workspace
+save([pathBase '.mat'])
+
+% Save Figures
+FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+for iFig = 1:length(FigList)
+  FigHandle = FigList(iFig);
+  FigName   = get(FigHandle, 'Name');
+  if isempty(FigName)
+      FigName = sprintf('Figure %d', FigHandle.Number);
+  end
+  savefig(FigHandle, [pathBase '_' FigName, '.fig']);
 end
 
 %% Grid search
