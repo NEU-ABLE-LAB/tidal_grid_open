@@ -26,7 +26,7 @@ classdef IslandGenRenewable < IslandPart
         
         % Maximum rated power (kW)
         %   (default) 1GW
-        MAX_RATED_POWER = 1E6;
+        MAX_RATED_POWER = 5000;
         
     end
     

@@ -15,10 +15,13 @@ classdef IslandBattery < IslandPart
         COST_E {mustBeNonnegative} 
                 
         % Power capacity CAPEX ($/kW)
-        COST_P {mustBeNonnegative}
+        COST_P %TODO {mustBeNonnegative} account for functional
         
         % Battery cycle life
         CYCLE_LIFE
+        
+        % Battery maximum life in years
+        MAX_YEARS_LIFE = 10;
         
         % Time horizon vector (hrs)
         TIME {mustBeNonnegative}
@@ -28,7 +31,7 @@ classdef IslandBattery < IslandPart
         
         % Cost of the battery not being charged the same as it was at the
         % beginning of the simulation ($/kWh)
-        COST_FINAL_CHARGE_ERROR = 5;
+        COST_FINAL_CHARGE_ERROR = 500;
         
         % Maximum power output of any design (kW)
         %   (default) 1GW
@@ -74,7 +77,8 @@ classdef IslandBattery < IslandPart
         
     
     methods
-        function obj = IslandBattery(name, cost_E, cost_P, cycle_life, t)
+        function obj = IslandBattery(name, cost_E, cost_P, ...
+                cycle_life, max_years_life, t)
             %ISLAND_BATTERY Construct a battery
             %   Construct a battery with energy storage cost per kWh
             %   `cost_E` ($/kWh), storage power costs per kW `cost_P`,
@@ -85,6 +89,7 @@ classdef IslandBattery < IslandPart
             obj.COST_E = cost_E;
             obj.COST_P = cost_P;
             obj.CYCLE_LIFE = cycle_life;
+            obj.MAX_YEARS_LIFE = max_years_life;
             obj.TIME = t(:); % Convert to vertical vector
             
             obj.NUM_STEPS = length(obj.TIME);
