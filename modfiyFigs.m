@@ -21,8 +21,7 @@ info.YDim = [3.25;3.25;3.25;3.25;3.25;3.25;3.25;3.25];
 
 %% Finalize Figures
 % Iterate through each file 
-for iFile = 1:length(info.figNames);
-    
+for iFile = 1:length(info.figNames)
     % Retrieve File Name
     figName = info.figNames{iFile};
     
@@ -34,14 +33,16 @@ for iFile = 1:length(info.figNames);
     
     % Set font size to 8 
     set(gca,'FontSize',8)
-    
+   
     % Set Units of Figure to inches
-    a.Units = 'inches';
-        
+    set(a,'Units','inches');
+    drawnow
+
     % Resize image based on specified dimensions
-    a.Position = [1,1,info.XDim(iFile),info.YDim(iFile)];
-    
-    % Save png with minimal white space
+    Pos = [1,1,info.XDim(iFile),info.YDim(iFile)];
+    set(a, 'Position', Pos);
+   
+    % Save png with minimal white space   
     exportgraphics(a,strcat(folderPath,'/Finalized/',figName,'.png'),'Resolution',300)
     
     % Save pdf with minimal white space
