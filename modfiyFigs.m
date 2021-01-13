@@ -36,75 +36,140 @@ for iFile = 1:length(info.figNames)
     
     % Set Units of Figure to inches
     set(a,'Units','inches');
+    
+    % Drawnow, so you dont have to wait for the figure to render
     drawnow
     
-    % Resize image based on specified dimensions
+    % Resize figure based on specified dimensions
     Pos = [1,1,info.XDim(iFile),info.YDim(iFile)];
     set(a, 'Position', Pos);
     
+    % Drawnow, so you dont have to wait for the figure to render
     drawnow
     
+    % This if statement specifies changes to be made for each figure
     if iFile == 1
+        % Retrieve an array of the files 'children'
         child = a.Children;
+        
+        % Remove the image 
         delete(child(2))
+        
+        % Change the linestyle to solid, color to black, and remove markers
         a.Children.Children.LineStyle = '-';
         a.Children.Children.Color = 'b';
         a.Children.Children.Marker = 'none';
+        
+        % Change FontSize to 8 
+        a.Children.FontSize = 8; 
+        a.Children.XLabel.FontSize = 8; 
+        a.Children.YLabel.FontSize = 8; 
+        
     elseif iFile == 2
+        % Change the title and axis labels. Make sure the fontsize is 8 
         title('Solar + Tidal + LIB','FontSize',8)
         xlabel('Tidal Rated Power (kW)','FontSize',8)
         ylabel('Solar Rated Power (kW)','FontSize',8)
+        
+        % Add the annotation 
         t = text(90,590,'$1506/MWh','FontSize',8);
         t.Color = 'red';
+        
+        % Reformat the axis limits to be consistent 
         caxis([0 10*1.0e+04])
+        
+        % Turn off countour lines 
         a.Children(2).Children(3).LineColor = 'none';
+        
+        % Add subfigure label
         sub = text(0,0,'(a)','Units','inches','FontSize',8);
         sub.Position = [-.25,2.75,0];
     elseif iFile == 3
+        % Change the title and axis labels. Make sure the fontsize is 8 
         title('Solar + Tidal + VRFP','FontSize',8)
         xlabel('Tidal Rated Power (kW)','FontSize',8)
         ylabel('Solar Rated Power (kW)','FontSize',8)
+
+        % Add the annotation 
         t = text(40,1550,'$1914/MWh','FontSize',8);
         t.Color = 'red';
+        
+        % Reformat the axis limits to be consistent 
         caxis([0 10*1.0e+04])
+        
+        % Turn off countour lines 
         a.Children(2).Children(3).LineColor = 'none';
+        
+        % Add subfigure label
         sub = text(0,0,'(b)','Units','inches','FontSize',8);
         sub.Position = [-.25,2.75,0];
     elseif iFile == 4
+        % Change the title and axis labels. Make sure the fontsize is 8 
         title('Solar + LIB + VRFP','FontSize',8)
         ylabel('Controller Span (hr)','FontSize',8)
         xlabel('Solar Rated Power (kW)','FontSize',8)
+        
+        % Add the annotation      
         t = text(200,15,'$2511/MWh','FontSize',8);
         t.Color = 'red';
+        
+        % Reformat the axis limits to be consistent 
         caxis([0 10*1.0e+04])
+
+        % Turn off countour lines 
         a.Children(2).Children(3).LineColor = 'none';
+
+        % Add subfigure label
         sub = text(0,0,'(c)','Units','inches','FontSize',8);
         sub.Position = [-.25,2.75,0];
     elseif iFile == 5
+        % Change the title and axis labels. Make sure the fontsize is 8      
         title('Tidal + LIB + VRFP','FontSize',8)
         ylabel('Controller Span (hr)','FontSize',8)
         xlabel('Tidal Rated Power (kW)','FontSize',8)
+        
+        % Add the annotation              
         t = text(120,65,'$1285/MWh','FontSize',8);
         t.Color = 'red';
+        
+        % Reformat the axis limits to be consistent         
         caxis([0 10*1.0e+04])
+        
+        % Turn off countour lines         
         a.Children(2).Children(3).LineColor = 'none';
+        
+        % Add subfigure label        
         sub = text(0,0,'(d)','Units','inches','FontSize',8);
         sub.Position = [-.25,2.75,0];
     elseif iFile == 6
+        % Find the different Axes
         hAx = findobj('type', 'axes');
+        
+        % Iterate through each axes
         for iAx = 1:length(hAx)
+            % We only want axes 2
             if iAx == 2
+                % make a new figure
                 aNew = figure;
+                
+                % Copy axis to new figure
                 hNew = copyobj(hAx(iAx), aNew);
+                
+                % Change units to inches 
                 aNew.Units = 'inches';
+                
+                % Resize figure based on specified dimensions
                 Pos = [1,1,info.XDim(iFile),info.YDim(iFile)];
                 set(aNew, 'Position', Pos);
             end
         end
-        title('pie')
+        
+        % Set legend column to 3 and font size to 8
         lgd = legend;
         lgd.NumColumns = 3;
         lgd.FontSize = 8;
+        
+        % Edit the legend names as specified 
         for iString = 1:length(lgd.String)
             if strfind(convertCharsToStrings(lgd.String{iString}),'flow')
                 lgd.String{iString}= strrep(lgd.String{iString},'flow','VRFB');
@@ -116,13 +181,21 @@ for iFile = 1:length(info.figNames)
                 lgd.String{iString}= strrep(convertCharsToStrings(lgd.String{iString}),'grid','Grid');
             end
         end
+        
+        % Set the units, resize, and position the legend 
         lgd.Units = 'inches';
         lgd.Position = [info.XDim(iFile)*.25/2,info.YDim(iFile)/16,info.XDim(iFile)*.75,info.YDim(iFile)/8];
+        
+        % Set the units and resize the pie chart 
         aNew.Children(2).Units = 'inches';
         aNew.Children(2).Position = [0,.25,info.XDim(iFile),info.XDim(iFile)];
+        
+        % Make new colormap based on colorbrewer 2, qualitative, 9 
         hexMap = {'8DD3C7','ffffb3','bebada','fb8072','fdb462','80b1d3','b3de69','fccde5','d9d9d9'};
+        
         % Tidal, Solar, LIB: Energy, LIB: Power, LIB: Error, VRFB: Energy,
         % VRFB Power, VRFB: Error, Grid
+        
         myColorMap = zeros(length(hexMap), 3); % Preallocate
         for k = 1 : length(hexMap)
             thisCell = hexMap{k};
@@ -132,8 +205,11 @@ for iFile = 1:length(info.figNames)
             myColorMap(k, :) = [r, g, b];
         end
         myColorMap = myColorMap / 255; % Normalize to range 0-1
+        
+        % Change the colormap to the new one 
         colormap(myColorMap);
         
+        % Edit pie chart labels as specified 
         hText = findobj(aNew,'Type','text');
         for iText = 1:length(hText);
             hText(iText).FontSize = 8;
@@ -147,8 +223,11 @@ for iFile = 1:length(info.figNames)
                 hText(iText).String = strrep(convertCharsToStrings(hText(iText).String),'grid','Grid');
             end
         end
+        
+        % Rotate pie chart so the labels fit nicely 
         view([60 90])   % this is to rotate the chart
         
+        % Align and position each label so they look nice 
         for iText = 1:length(hText)
             hText(iText).HorizontalAlignment = 'center';
             hText(iText).VerticalAlignment = 'middle';
@@ -167,15 +246,24 @@ for iFile = 1:length(info.figNames)
             else
             end
         end
+        % Save over file a 
         a = aNew;
     elseif iFile == 7
+        % Remove middle axis 
         a.Children.DisplayVariables = {a.Children.DisplayVariables{1},a.Children.DisplayVariables{3}};
+        
+        % Rename legend Labels as specified 
         a.Children.AxesProperties(1).LegendLabels = {'Demand','Tidal','Solar'};
         a.Children.AxesProperties(2).LegendLabels = {'LIB','VRFB'};
+        
+        % Remove title 
         title('')
     elseif iFile == 8
+        % Change legend font size 
         lgd = a.Children(1);
         lgd.FontSize = 8;
+        
+        % Edit legend labels as specified 
         for iString = 1:length(lgd.String)
             if strfind(convertCharsToStrings(lgd.String{iString}),'flow')
                 lgd.String{iString}= strrep(lgd.String{iString},'flow','VRFB');
@@ -187,15 +275,25 @@ for iFile = 1:length(info.figNames)
                 lgd.String{iString}= strrep(convertCharsToStrings(lgd.String{iString}),'grid','Grid');
             end
         end
+        
+        
         for iChild = 1:length(a.Children)
+            % There are 4 subplots in this figure, for each of them 
             if isa(a.Children(iChild),'matlab.graphics.axis.Axes') == 1
+                % Set the Y Lim to be uniform 
                 a.Children(iChild).YLim = [0 2500];
+                
+                % Change all the fontsizes to 8 
                 a.Children(iChild).Title.FontSize = 8;
                 a.Children(iChild).XLabel.FontSize = 8;
                 a.Children(iChild).YLabel.FontSize = 8;
                 a.Children(iChild).XAxis.FontSize = 8;
                 a.Children(iChild).YAxis.FontSize = 8;
-                a.Children(iChild).ColorOrder = myColorMap; 
+                
+                % Set the colormap to the same as before 
+                a.Children(iChild).ColorOrder = myColorMap;
+                
+                % Rename titles as specified 
                 if a.Children(iChild).Title.String == "Solar PV Cost"
                     a.Children(iChild).Title.String = "Solar PV Generator Cost";
                 elseif a.Children(iChild).Title.String == "Flow Battery Cost"
@@ -206,10 +304,13 @@ for iFile = 1:length(info.figNames)
             end
         end
     end
+    
     % Save png with minimal white space
     exportgraphics(a,strcat(folderPath,'/Finalized/',figName,'.png'),'Resolution',300)
     
     % Save pdf with minimal white space
     exportgraphics(a,strcat(folderPath,'/Finalized/',figName,'.pdf'),'Resolution',300)
+    
+    % close it! 
     close(a)
 end
