@@ -65,6 +65,9 @@ for iFile = 1:length(info.figNames)
         a.Children.XLabel.FontSize = 8; 
         a.Children.YLabel.FontSize = 8; 
         
+        a.Children.YLabel.String = "Capital Cost ($/kWh)";
+        a.Children.XLabel.String = "E/P, duration (hrs)"; 
+        
     elseif iFile == 2
         % Change the title and axis labels. Make sure the fontsize is 8 
         title('Solar + Tidal + LIB','FontSize',8)
@@ -294,8 +297,10 @@ for iFile = 1:length(info.figNames)
                 a.Children(iChild).ColorOrder = myColorMap;
                 
                 % Rename titles as specified 
-                if a.Children(iChild).Title.String == "Solar PV Cost"
-                    a.Children(iChild).Title.String = "Solar PV Generator Cost";
+                if a.Children(iChild).Title.String == "Tidal Generator Cost"
+                    a.Children(iChild).Title.String = "Tidal RES"
+                elseif a.Children(iChild).Title.String == "Solar PV Cost"
+                    a.Children(iChild).Title.String = "Solar PV RES"
                 elseif a.Children(iChild).Title.String == "Flow Battery Cost"
                     a.Children(iChild).Title.String = "VRFB Cost";
                 elseif a.Children(iChild).Title.String =="Li-Ion Battery Cost"
