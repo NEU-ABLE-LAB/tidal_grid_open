@@ -265,7 +265,7 @@ for iFile = 1:length(info.figNames)
         % Change legend font size
         lgd = a.Children(1);
         lgd.FontSize = 8;
-       
+        
         % Edit legend labels as specified
         for iString = 1:length(lgd.String)
             if strfind(convertCharsToStrings(lgd.String{iString}),'flow')
@@ -278,7 +278,7 @@ for iFile = 1:length(info.figNames)
                 lgd.String{iString}= strrep(convertCharsToStrings(lgd.String{iString}),'grid','Grid');
             end
         end
-
+        
         for iChild = 1:length(a.Children)
             % There are 4 subplots in this figure, for each of them
             if isa(a.Children(iChild),'matlab.graphics.axis.Axes') == 1
@@ -308,13 +308,12 @@ for iFile = 1:length(info.figNames)
             end
         end
         
-                
-        % Re-order Legend 
         
+        % Re-order Legend
         lbl = a.Children(1).String;                         % Retrieve legend labels
         numlbl = length(lbl);                               % Determine number of lables
-        order = sort(1:1:numlbl,'descend');                 % Create array of label numbers in descending order 
-        newlbl = lbl(order);                                % Create new labels in descending order  
+        order = sort(1:1:numlbl,'descend');                 % Create array of label numbers in descending order
+        newlbl = lbl(order);                                % Create new labels in descending order
         legend(findobj(a.Children(2),'Type','area'),newlbl) % Set the legend to follow the new labels
         
     end
