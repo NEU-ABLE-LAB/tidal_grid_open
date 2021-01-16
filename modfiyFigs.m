@@ -79,7 +79,8 @@ for iFile = 1:length(info.figNames)
         t.Color = 'red';
         
         % Reformat the axis limits to be consistent
-        caxis([0 10*1.0e+04])
+        max = 10*1.0e+04;
+        caxis([0 max])
         
         % Turn off countour lines
         a.Children(2).Children(3).LineColor = 'none';
@@ -87,6 +88,12 @@ for iFile = 1:length(info.figNames)
         % Add subfigure label
         sub = text(0,0,'(a)','Units','inches','FontSize',8);
         sub.Position = [-.25,2.75,0];
+        
+        % Adjust render & countour lines for printing quality
+        levels = 0:10000:max;
+        a.Children(2).Children(4).LevelList = levels;
+        a.Renderer = 'painters';
+
     elseif iFile == 3
         % Change the title and axis labels. Make sure the fontsize is 8
         title('Solar + Tidal + VRFP','FontSize',8)
@@ -97,8 +104,9 @@ for iFile = 1:length(info.figNames)
         t = text(40,1550,'$1914/MWh','FontSize',8);
         t.Color = 'red';
         
-        % Reformat the axis limits to be consistent
-        caxis([0 10*1.0e+04])
+       % Reformat the axis limits to be consistent
+        max = 10*1.0e+04;
+        caxis([0 max])
         
         % Turn off countour lines
         a.Children(2).Children(3).LineColor = 'none';
@@ -106,6 +114,11 @@ for iFile = 1:length(info.figNames)
         % Add subfigure label
         sub = text(0,0,'(b)','Units','inches','FontSize',8);
         sub.Position = [-.25,2.75,0];
+        
+        % Adjust render & countour lines for printing quality
+        levels = 0:10000:max;
+        a.Children(2).Children(4).LevelList = levels;
+        a.Renderer = 'painters';
     elseif iFile == 4
         % Change the title and axis labels. Make sure the fontsize is 8
         title('Solar + LIB + VRFP','FontSize',8)
@@ -117,7 +130,8 @@ for iFile = 1:length(info.figNames)
         t.Color = 'red';
         
         % Reformat the axis limits to be consistent
-        caxis([0 10*1.0e+04])
+        max = 10*1.0e+04;
+        caxis([0 max])
         
         % Turn off countour lines
         a.Children(2).Children(3).LineColor = 'none';
@@ -125,6 +139,11 @@ for iFile = 1:length(info.figNames)
         % Add subfigure label
         sub = text(0,0,'(c)','Units','inches','FontSize',8);
         sub.Position = [-.25,2.75,0];
+        
+        % Adjust render & countour lines for printing quality
+        levels = 0:10000:max;
+        a.Children(2).Children(4).LevelList = levels;
+        a.Renderer = 'painters';
     elseif iFile == 5
         % Change the title and axis labels. Make sure the fontsize is 8
         title('Tidal + LIB + VRFP','FontSize',8)
@@ -136,7 +155,8 @@ for iFile = 1:length(info.figNames)
         t.Color = 'red';
         
         % Reformat the axis limits to be consistent
-        caxis([0 10*1.0e+04])
+        max = 10*1.0e+04;
+        caxis([0 max])
         
         % Turn off countour lines
         a.Children(2).Children(3).LineColor = 'none';
@@ -144,6 +164,11 @@ for iFile = 1:length(info.figNames)
         % Add subfigure label
         sub = text(0,0,'(d)','Units','inches','FontSize',8);
         sub.Position = [-.25,2.75,0];
+        
+        % Adjust render & countour lines for printing quality
+        levels = 0:10000:max;
+        a.Children(2).Children(4).LevelList = levels;
+        a.Renderer = 'painters';
     elseif iFile == 6
         % Find the different Axes
         hAx = findobj('type', 'axes');
@@ -262,6 +287,7 @@ for iFile = 1:length(info.figNames)
         % Remove title
         title('')
     elseif iFile == 8
+        
         % Change legend font size
         lgd = a.Children(1);
         lgd.FontSize = 8;
