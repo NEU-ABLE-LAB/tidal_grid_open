@@ -96,7 +96,7 @@ for iFile = 1:length(info.figNames)
 
     elseif iFile == 3
         % Change the title and axis labels. Make sure the fontsize is 8
-        title('Solar + Tidal + VRFP','FontSize',8)
+        title('Solar + Tidal + VRFB','FontSize',8)
         xlabel('Tidal Rated Power (kW)','FontSize',8)
         ylabel('Solar Rated Power (kW)','FontSize',8)
         
@@ -121,7 +121,7 @@ for iFile = 1:length(info.figNames)
         a.Renderer = 'painters';
     elseif iFile == 4
         % Change the title and axis labels. Make sure the fontsize is 8
-        title('Solar + LIB + VRFP','FontSize',8)
+        title('Solar + LIB + VRFB','FontSize',8)
         ylabel('Controller Span (hr)','FontSize',8)
         xlabel('Solar Rated Power (kW)','FontSize',8)
         
@@ -146,7 +146,7 @@ for iFile = 1:length(info.figNames)
         a.Renderer = 'painters';
     elseif iFile == 5
         % Change the title and axis labels. Make sure the fontsize is 8
-        title('Tidal + LIB + VRFP','FontSize',8)
+        title('Tidal + LIB + VRFB','FontSize',8)
         ylabel('Controller Span (hr)','FontSize',8)
         xlabel('Tidal Rated Power (kW)','FontSize',8)
         
